@@ -1,0 +1,20 @@
+{
+  "name": "devtindernamastejs",
+  "version": "1.0.0",
+  "description": "tinder for Developers",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "dev":""
+  },
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "author": "Shivani Solanki",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7"
+  }
+}
