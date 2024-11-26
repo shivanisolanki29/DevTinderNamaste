@@ -71,11 +71,32 @@ app.post("/signup", async (req, res) => {
   }
 });
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
+    //verify email
+    // const validateEmail = (email) => {
+    if (!email || !validator.isEmail(email)) {
+      throw new Error("Invalid credential");
+    }
 
-  //verify email
+    //read data (email and password) from db
+    const userDb = await Users.findOne({ email: email });
 
-  //verify password
+    //comapre the password req.body and DB
+    const isValidPass = await bcrypt.compare(password, userDb.password);
+    if (isValidPass) {
+      res.send("Successful login");
+    } else {
+      throw new Error(" Invalid credential");
+    }
+
+    // };
+  } catch (err) {
+    res.status(404).send("ERROR:  " + err.message);
+  }
+
+  //compare email check if matches or not
+  //copmare password check if matches or not
 });
 app.patch("/user/:userId", async (req, res) => {
   const userId = req.params?.userId;

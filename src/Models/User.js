@@ -58,8 +58,8 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
-
-const Users = new model("UserModels", UserSchema);
+//note change model name - collectionname in database from usermodels to users
+const Users = new model("User", UserSchema);
 //const users = mongoose.model(users,UserSchema)
 
 module.exports = { Users };
