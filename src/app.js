@@ -2,6 +2,8 @@ const express = require("express");
 const { connectDB } = require("./config/database.js");
 const { Users } = require("./Models/User.js");
 const validator = require("validator");
+const { ValidationSignUp } = require("./Utils/Validations.js");
+const bcrypt = require("bcrypt");
 const app = new express();
 
 // Middleware to handle JSON
@@ -43,17 +45,23 @@ app.delete("/user", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const user = new Users(req.body);
-  const data = req.body;
   try {
-    // console.log(validator.isEmail(req.body.email));
-    if (!validator.isEmail(data.email)) {
-      throw new Error("Invalid emailid " + data.email);
-    }
+    //validate the data
 
-    if (!validator.isStrongPassword(data.password)) {
-      throw new Error("Enter a strong password");
-    }
+    ValidationSignUp(req);
+
+    const { firstName, lastName, email, password } = req.body;
+    //encrypt the password
+    const pwdHash = await bcrypt.hash(password, 10);
+
+    // const user = new Users(req.body);//this is not a good way directly pass req.body
+    const user = new Users({
+      firstName,
+      lastName,
+      email,
+      password: pwdHash,
+    }); //this is a good way directly pass req.body
+
     // throw new error("xyz");
     await user.save();
     //res.send("Add user successfully");
@@ -62,7 +70,13 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error saving the user: " + err.message);
   }
 });
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 
+  //verify email
+
+  //verify password
+});
 app.patch("/user/:userId", async (req, res) => {
   const userId = req.params?.userId;
   const data = req.body;

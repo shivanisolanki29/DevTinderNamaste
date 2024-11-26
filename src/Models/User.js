@@ -4,7 +4,13 @@ const validator = require("validator");
 
 const UserSchema = new Schema(
   {
-    firstName: { type: String, required: true, minLength: 3, trim: true },
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 3,
+      maxLength: 30,
+      trim: true,
+    },
     lastName: { type: String, trim: true },
     email: {
       type: String,
@@ -13,7 +19,7 @@ const UserSchema = new Schema(
       trim: true,
       unique: true,
       validate(value) {
-        console.log("value from email schema" + value);
+        // console.log("value from email schema" + value);
         if (!validator.isEmail(value)) {
           throw new Error("Invalid emailid " + value);
         }
