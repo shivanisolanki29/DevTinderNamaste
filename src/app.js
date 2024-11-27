@@ -5,44 +5,15 @@ const validator = require("validator");
 const { ValidationSignUp } = require("./Utils/Validations.js");
 const bcrypt = require("bcrypt");
 const app = new express();
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 // Middleware to handle JSON
-const sm = app.use(express.json());
+app.use(express.json());
+
+//Middle ware to Parser the cooking (JWT)
+app.use(cookieParser());
 //read data from db
-
-//get user by applying fliter
-app.get("/user", async (req, res) => {
-  // console.log(req.body._id);
-  try {
-    const FindUser = await Users.findOne({ firstName: "Sonam" });
-    console.log("user with filter :" + FindUser);
-    res.send("got data user by filter ");
-  } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
-  }
-});
-
-//get all users
-app.get("/feed", async (req, res) => {
-  try {
-    const allUsers = await Users.find({});
-    console.log("all users details:" + allUsers);
-    res.send("Get all users data");
-  } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
-  }
-});
-app.delete("/user", async (req, res) => {
-  console.log("Hello from delete");
-  const userdeleteId = req.body.userId;
-  console.log(userdeleteId);
-  try {
-    await Users.findByIdAndDelete(userdeleteId);
-    res.send("user delete");
-  } catch (err) {
-    res.status(400).send("Error delete the user:" + err.message);
-  }
-});
 
 app.post("/signup", async (req, res) => {
   try {
@@ -84,7 +55,15 @@ app.post("/login", async (req, res) => {
 
     //comapre the password req.body and DB
     const isValidPass = await bcrypt.compare(password, userDb.password);
+
     if (isValidPass) {
+      let token = await jwt.sign({ _id: userDb._id }, "Dev@Tinder123");
+      // send res back with Jwt wrap in cookies + success message
+      res.cookie("token", token); //create token with jwt
+      // res.cookie("token", "dsgfjgfajkffffffffffbdhjgdjffffhdfksjakfkjfgg"); //create dummy cookie by myself
+
+      // console.log(token);
+
       res.send("Successful login");
     } else {
       throw new Error(" Invalid credential");
@@ -98,6 +77,72 @@ app.post("/login", async (req, res) => {
   //compare email check if matches or not
   //copmare password check if matches or not
 });
+
+//read/get profile details from DB
+app.get("/profile", async (req, res) => {
+  try {
+    //cookie come with req
+    const reqCookie = req.cookies;
+
+    //parser the cookie using middle ware (cookie-parser)
+    // const cookieParser = require("cookie-parser");
+    // app.use(cookieParser())
+
+    //Extact token from cookies
+    const { token } = reqCookie;
+    if (!token) {
+      throw new Error("Cookie is not get it");
+    }
+    //veryfy it or compare it
+    let decodeMsg = await jwt.verify(token, "Dev@Tinder123");
+
+    //if varify true
+    const { _id } = decodeMsg;
+
+    const userwithId = await Users.findById({ _id });
+
+    //send respose back with profile details
+    res.send("User profile: " + userwithId);
+  } catch (err) {
+    // console.log(err.message);
+    res.status(404).send("ERROR:  " + err.message);
+  }
+});
+
+//get user by applying fliter
+app.get("/user", async (req, res) => {
+  // console.log(req.body._id);
+  try {
+    const FindUser = await Users.findOne({ firstName: "Sonam" });
+    console.log("user with filter :" + FindUser);
+    res.send("got data user by filter ");
+  } catch (err) {
+    res.status(400).send("Error saving the user:" + err.message);
+  }
+});
+
+//get all users
+app.get("/feed", async (req, res) => {
+  try {
+    const allUsers = await Users.find({});
+    console.log("all users details:" + allUsers);
+    res.send("Get all users data");
+  } catch (err) {
+    res.status(400).send("Error saving the user:" + err.message);
+  }
+});
+app.delete("/user", async (req, res) => {
+  console.log("Hello from delete");
+  const userdeleteId = req.body.userId;
+  console.log(userdeleteId);
+  try {
+    await Users.findByIdAndDelete(userdeleteId);
+    res.send("user delete");
+  } catch (err) {
+    res.status(400).send("Error delete the user:" + err.message);
+  }
+});
+
 app.patch("/user/:userId", async (req, res) => {
   const userId = req.params?.userId;
   const data = req.body;
