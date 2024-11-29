@@ -1,6 +1,7 @@
 const express = require("express");
 const { connectDB } = require("./config/database.js");
 const { Users } = require("./Models/User.js");
+const { userAuth } = require("./middleware/auth.js");
 const validator = require("validator");
 const { ValidationSignUp } = require("./Utils/Validations.js");
 const bcrypt = require("bcrypt");
@@ -56,15 +57,16 @@ app.post("/login", async (req, res) => {
     //comapre the password req.body and DB
     const isValidPass = await bcrypt.compare(password, userDb.password);
 
+    // const timeExpire = new Date('28/11/2024T');
     if (isValidPass) {
       let token = await jwt.sign({ _id: userDb._id }, "Dev@Tinder123");
+      // , {expiresIn: 30,});
       // send res back with Jwt wrap in cookies + success message
-      res.cookie("token", token); //create token with jwt
+      res.cookie("token", token);
+      // { expires: new Date(Date.now() + 10 * 1000) }); //create token with jwt expire in 10 sec
       // res.cookie("token", "dsgfjgfajkffffffffffbdhjgdjffffhdfksjakfkjfgg"); //create dummy cookie by myself
 
-      // console.log(token);
-
-      res.send("Successful login");
+      res.send("Login successfully");
     } else {
       throw new Error(" Invalid credential");
     }
@@ -79,99 +81,33 @@ app.post("/login", async (req, res) => {
 });
 
 //read/get profile details from DB
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    //cookie come with req
-    const reqCookie = req.cookies;
-
-    //parser the cookie using middle ware (cookie-parser)
-    // const cookieParser = require("cookie-parser");
-    // app.use(cookieParser())
-
-    //Extact token from cookies
-    const { token } = reqCookie;
-    if (!token) {
-      throw new Error("Cookie is not get it");
-    }
-    //veryfy it or compare it
-    let decodeMsg = await jwt.verify(token, "Dev@Tinder123");
-
-    //if varify true
-    const { _id } = decodeMsg;
-
-    const userwithId = await Users.findById({ _id });
-
+    // const { user } = userAuth;q
     //send respose back with profile details
-    res.send("User profile: " + userwithId);
+    res.send("User profile: " + req.user);
   } catch (err) {
     // console.log(err.message);
     res.status(404).send("ERROR:  " + err.message);
   }
 });
 
-//get user by applying fliter
-app.get("/user", async (req, res) => {
-  // console.log(req.body._id);
+app.post("/sendconnection", userAuth, (req, res) => {
   try {
-    const FindUser = await Users.findOne({ firstName: "Sonam" });
-    console.log("user with filter :" + FindUser);
-    res.send("got data user by filter ");
+    //verify auth
+
+    //send connection
+    res.send("connection successfully with " + req.user.firstName);
+    //
   } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
+    res.status(404).send("ERR : " + err.message);
   }
 });
-
-//get all users
-app.get("/feed", async (req, res) => {
-  try {
-    const allUsers = await Users.find({});
-    console.log("all users details:" + allUsers);
-    res.send("Get all users data");
-  } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
-  }
-});
-app.delete("/user", async (req, res) => {
-  console.log("Hello from delete");
-  const userdeleteId = req.body.userId;
-  console.log(userdeleteId);
-  try {
-    await Users.findByIdAndDelete(userdeleteId);
-    res.send("user delete");
-  } catch (err) {
-    res.status(400).send("Error delete the user:" + err.message);
-  }
-});
-
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-
-  console.log(data);
-  try {
-    const Allowed_Updates = ["age", "skills", "photoUrl", "gender"];
-    const IsUpdateAllowed = Object.keys(data).every((k) =>
-      Allowed_Updates.includes(k)
-    );
-    if (!IsUpdateAllowed) {
-      throw new Error("Update Not allowed");
-    }
-
-    if (data?.skills.length > 10) {
-      throw new Error("skills Not be more then 10");
-    }
-    await Users.findByIdAndUpdate(userId, data, { runValidators: true });
-    res.send(`${data} successfully updated in DB`);
-  } catch (err) {
-    res.status(400).send("Error saving the user: " + err.message);
-  }
-});
-
 connectDB()
   .then(() => {
-    console.log("succesfully connected DB");
+    console.log("Datebase connection established... ");
     app.listen(3000, () => {
-      console.log("hello from server");
+      console.log("Server is successfully listening on port 3000....");
     });
   })
   .catch((err) => {
