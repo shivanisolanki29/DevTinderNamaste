@@ -1,22 +1,9 @@
-// const adminAuthentication = (req, res, next) => {
-//   //
-//   const token = "xyz";
-//   const isAdminAuthValidation = token === "xyz";
-//   if (!isAdminAuthValidation) {
-//     res.status(404).send("unautherized admin request");
-//   } else {
-//     next();
-//   }
-// };
-
 const jwt = require("jsonwebtoken");
 const { Users } = require("../Models/User");
 
 const userAuth = async (req, res, next) => {
   try {
     //cookie come with req and Extact token from cookies
-    //parser the cookie using middle ware (cookie-parser)
-    // app.use(cookieParser())
     const { token } = req.cookies;
 
     if (!token) {
@@ -38,16 +25,6 @@ const userAuth = async (req, res, next) => {
   } catch (err) {
     res.status(404).send("ERROR:  " + err.message);
   }
-
-  // const req.user = user;
-
-  // const authToken = "xyz";
-  // const authValidation = authreq === authToken;
-  // if (!authValidation) {
-  //   res(404).send("unautherized user req");
-  // } else {
-  //   next();
-  // }
 };
 
 module.exports = { userAuth };
