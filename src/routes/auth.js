@@ -8,7 +8,7 @@ const { Users } = require("../Models/User.js");
 const { now } = require("mongoose");
 const validator = require("validator");
 
-console.log("heloo from router");
+// console.log("heloo from router");
 
 authRouter.post("/signup", async (req, res) => {
   try {

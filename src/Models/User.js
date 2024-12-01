@@ -39,7 +39,7 @@ const UserSchema = new Schema(
     gender: {
       type: String,
       validate(value) {
-        if (!["male", "female", "other"].includes(value)) {
+        if (!["male", "female", "others"].includes(value)) {
           throw new Error("Gender data not valid");
         }
       },
@@ -50,11 +50,17 @@ const UserSchema = new Schema(
         "https://kobikoachman.com/wp-content/uploads/2018/03/dummyProfile-male.jpg",
       validate(value) {
         if (!validator.isURL(value)) {
-          throw new Error("Invalid URL ");
+          throw new Error("Invalid Photo URL " + value);
         }
       },
     },
-    skills: [String],
+    about: {
+      type: String,
+      default: "This is a default about of the user!",
+    },
+    skills: {
+      type: [String],
+    },
   },
   { timestamps: true }
 );

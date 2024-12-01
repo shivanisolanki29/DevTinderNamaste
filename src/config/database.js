@@ -1,5 +1,6 @@
 const mongoos = require("mongoose");
 
+// console.log("Hello from DB");
 //retun a promise use Async- await function
 // mongoose.connect(
 //   "mongodb+srv://shivanisolanki2882:8t66CY7zYFPVo0l0@nodecluster.jbw2z.mongodb.net/"
