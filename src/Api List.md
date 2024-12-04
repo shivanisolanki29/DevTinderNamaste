@@ -15,7 +15,7 @@
 ## connectionRequestRouter
 
 -post/request/send/ignore
--post/request/send/inter
+-post/request/send/interested
 -post/request/review/accept
 -post/request/review/rejected
 
