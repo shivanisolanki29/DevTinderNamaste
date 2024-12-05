@@ -2,9 +2,10 @@ const express = require("express");
 const userRouter = express.Router();
 const { userAuth } = require("../middleware/auth");
 const { ConnectionRequest } = require("../Models/connenctionRequest");
+const { Users } = require("../Models/User");
 // -get /user/request/receive (status interested -->accepted/rejected)     -ep-13
 
-const User_Safe_Date = "firstName lastName photoUrl age about gender skills";
+const User_Safe_Data = "firstName lastName photoUrl age about gender skills";
 userRouter.get(
   "/user/requests/received", //received request for accpeted/rejected
   userAuth,
@@ -17,7 +18,7 @@ userRouter.get(
       const data = await ConnectionRequest.find({
         toUserId: loggedInUser._id,
         status: "interested",
-      }).populate("fromUserId", User_Safe_Date);
+      }).populate("fromUserId", User_Safe_Data);
       // .populate("fromUserId", ["firstName", "lastName"]);
 
       if (!data) {
@@ -44,7 +45,7 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
         { toUserId: loggedInUser, status: "accepted" },
       ],
     })
-      .populate("fromUserId", User_Safe_Date)
+      .populate("fromUserId", User_Safe_Data)
       .populate("toUserId");
 
     console.log(ConnectionRequests);
@@ -63,4 +64,39 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
   }
 });
 
+//user/feed api
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    //user can not see - loggedinuser sent or receive req and loggedin user
+
+    const connenctionReqs = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+    // .populate("fromUserId", "firstName lastName")
+    // .populate("toUserId", "firstName lastName");
+    const hideUserFromFeed = new Set();
+
+    connenctionReqs.forEach((req) => {
+      hideUserFromFeed.add(req.fromUserId.toString());
+      hideUserFromFeed.add(req.toUserId.toString());
+    });
+
+    console.log(hideUserFromFeed);
+
+    const userFeed = await Users.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUserFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(User_Safe_Data);
+
+    res.json({
+      message: "feed users:",
+      data: userFeed,
+    });
+  } catch (err) {
+    res.status(400).send("ERR : " + err.message);
+  }
+});
 module.exports = { userRouter };
