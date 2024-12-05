@@ -15,7 +15,7 @@
 ## connectionRequestRouter
 
 -post/request/send/:status/:toUserId (userId - to whom send the request )
--post/request/review/:status/:requestId (requestId - req object it to review request)
+-post/request/review/:status/:requestId (requestId - req object it to review request)qq ep-13
 
 -post/request/send/ignore/requestId
 -post/request/send/interested/RequestId
@@ -24,6 +24,6 @@
 
 ## userRouter
 
+    -get/request/receive -ep-13
     -get/connections (who likes me/Matches and all connections)
-    -get/request/receive
     -get/feed (all users which i can view)
