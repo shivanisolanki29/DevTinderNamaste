@@ -27,9 +27,11 @@ connectionRequestSchema.pre("save", function (next) {
   const connectionRequest = this;
   // console.log(connectionRequest);
   //check if the fromUserId is same as touserId
-  let compVal = connectionRequest.fromUserId.equals(connectionRequest.toUserId);
+  let compareUserId = connectionRequest.fromUserId.equals(
+    connectionRequest.toUserId
+  );
   // console.log(compVal);
-  if (compVal) {
+  if (compareUserId) {
     throw new Error("Cannot send connection request to yourself");
   }
   next();

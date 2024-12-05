@@ -21,6 +21,10 @@
   -create patch/profile/passward =>forgot password api
   -make validate all data in every post/patch(it is v vvv IMP)
 
+## Episode -13
+
+- write api with proper validartion for post/request/review/:status/:requestId
+
 ## Testing Data
 
 {
@@ -39,4 +43,9 @@
 "lastName": "Ritchie",
 "email": "dennis@gmail.com",
 "password": "Dennis@123"
+}
+
+{
+"email": "akshay@gmail.com",
+"password": "Akshay@123"
 }

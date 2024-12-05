@@ -14,13 +14,16 @@
 
 ## connectionRequestRouter
 
--post/request/send/ignore
--post/request/send/interested
--post/request/review/accept
+-post/request/send/:status/:toUserId (userId - to whom send the request )
+-post/request/review/:status/:requestId (requestId - req object it to review request)
+
+-post/request/send/ignore/requestId
+-post/request/send/interested/RequestId
+-post/request/review/accepted
 -post/request/review/rejected
 
 ## userRouter
 
--get/connections (who likes me/Matches and all connections)
--get/request/receive
--get/feed (all users which i can view)
+    -get/connections (who likes me/Matches and all connections)
+    -get/request/receive
+    -get/feed (all users which i can view)
