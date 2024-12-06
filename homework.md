@@ -24,6 +24,16 @@
 ## Episode -13
 
 - write api with proper validartion for post/request/review/:status/:requestId
+  -thought process- POST vs GET
+  -Read about ref and populate https://mongoosejs.com/docs/populate.html
+  -create GEt user/requests/received with all the checks
+  -Create GET Get /users/connections
+
+## Episode-14
+
+-Logic for GET /feed APi
+-explore the $nin,$and and $ne and other comparision operators
+-Pagination
 
 ## Testing Data
 

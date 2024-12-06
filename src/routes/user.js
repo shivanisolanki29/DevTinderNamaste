@@ -65,9 +65,14 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
 });
 
 //user/feed api
-userRouter.get("/user/feed", userAuth, async (req, res) => {
+userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
+    const page = req.query.page || 1;
+    let limit = req.query.limit || 10;
+    const skip = (page - 1) * limit;
+    //validate limit
+    limit = limit > 50 ? 50 : limit;
     //user can not see - loggedinuser sent or receive req and loggedin user
 
     const connenctionReqs = await ConnectionRequest.find({
@@ -82,14 +87,15 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
       hideUserFromFeed.add(req.toUserId.toString());
     });
 
-    console.log(hideUserFromFeed);
-
     const userFeed = await Users.find({
       $and: [
         { _id: { $nin: Array.from(hideUserFromFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select(User_Safe_Data);
+    })
+      .select(User_Safe_Data)
+      .skip(skip)
+      .limit(limit);
 
     res.json({
       message: "feed users:",
