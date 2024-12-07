@@ -19,7 +19,7 @@
 - -Create post/logout api
   -create patch/profile/edit api
   -create patch/profile/passward =>forgot password api
-  -make validate all data in every post/patch(it is v vvv IMP)
+  -make validate all data in every post/patch(it is v vvv IM P)
 
 ## Episode -13
 
