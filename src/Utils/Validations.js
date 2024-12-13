@@ -11,25 +11,27 @@ const ValidationSignUp = (req) => {
     throw new Error("Enter a strong password");
   }
 };
-const validationProfileEdit = (req) => {
+const validationProfileEditData = (req) => {
   const { firstName, lastName, age, gender, skills, about } = req.body;
 
-  if ((req.body = {})) {
+  if (req.body == {}) {
     throw new Error("no data to Update");
   }
+  // if (firstName.length < 4 && firstName.length > 30) {
+  //   throw new Error("Name should be greater then 4 character");
+  // }
   if (age < 18) {
-    console.log(age);
     throw new Error("age should be more then 18 year");
   }
   if (gender) {
     if (!["male", "female", "others"].includes(gender)) {
-      console.log(gender);
+      // console.log(gender);
       throw new Error("Gender data not valid");
     }
   }
   if (skills) {
     if (skills.length > 10) {
-      console.log(skills);
+      // console.log(skills);
       throw new Error("Skills should be less then or equal to 10");
     }
   }
@@ -46,8 +48,6 @@ const validationProfileEdit = (req) => {
   // if (about.trim().split(/\s+/) < 100) {
   //   throw new Error("About should be less then 100 words");
   // }
-
-  console.log("inside validation");
 };
 
 const validatePassword = (password) => {
@@ -57,4 +57,8 @@ const validatePassword = (password) => {
     throw new Error("Enter a strong password");
   }
 };
-module.exports = { ValidationSignUp, validationProfileEdit, validatePassword };
+module.exports = {
+  ValidationSignUp,
+  validationProfileEditData,
+  validatePassword,
+};

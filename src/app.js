@@ -7,9 +7,16 @@ const { profileRouter } = require("./routes/profile.js");
 const { requestRouter } = require("./routes/request.js");
 const { userRouter } = require("./routes/user.js");
 
+const cors = require("cors");
 const app = new express();
 const cookieParser = require("cookie-parser");
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,5 +33,8 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error("db not connected");
+    // throw new Error(err.message);
+    console.log("db not connected");
+    console.log(err.message);
+    return err.message;
   });

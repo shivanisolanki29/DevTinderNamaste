@@ -8,6 +8,7 @@ const mongoos = require("mongoose");
 
 const connectDB = async () => {
   await mongoos.connect(
+    // "mongodb+srv://shivanisolanki28:8t66CY7zYFPVo0l0@nodecluster.jbw2z.mongodb.net/devTinder"
     "mongodb+srv://shivanisolanki2882:8t66CY7zYFPVo0l0@nodecluster.jbw2z.mongodb.net/devTinder"
   );
 };

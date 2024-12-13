@@ -40,13 +40,18 @@ authRouter.post("/login", async (req, res) => {
     }
 
     const userDb = await Users.findOne({ email: email });
+    if (!userDb) {
+      throw new Error("Invalid Credentials");
+    }
     const isValidPass = await bcrypt.compare(password, userDb.password);
 
     if (isValidPass) {
       let token = await jwt.sign({ _id: userDb._id }, "Dev@Tinder123", {
         expiresIn: "7d",
       });
-      res.cookie("token", token).send("Login successfully");
+      res
+        .cookie("token", token, { expires: new Date(Date.now() + 8 * 3600000) })
+        .send(userDb);
     } else {
       throw new Error(" Invalid credential");
     }

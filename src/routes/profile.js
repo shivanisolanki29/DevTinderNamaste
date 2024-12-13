@@ -3,7 +3,7 @@ const profileRouter = express.Router();
 const { userAuth } = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const {
-  validationProfileEdit,
+  validationProfileEditData,
   validatePassword,
 } = require("../Utils/Validations");
 const { contains } = require("validator");
@@ -13,7 +13,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     // const { user } = userAuth;q
     //send respose back with profile details
-    res.send("User profile: " + req.user);
+    res.send(req.user);
   } catch (err) {
     // console.log(err.message);
     res.status(404).send("ERROR:  " + err.message);
@@ -22,10 +22,8 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    console.log("start");
     //always check data senitization
-    validationProfileEdit(req);
-    console.log("End validation");
+    validationProfileEditData(req);
     const allowedEditFields = [
       "firstName",
       "lastName",
@@ -35,9 +33,11 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
       "gender",
       "photoUrl",
     ];
-    const isAllowed = Object.keys(req.body).every((key) =>
-      allowedEditFields.includes(key)
+    const isAllowed = Object.keys(req.body).every((field) =>
+      allowedEditFields.includes(field)
     );
+
+    // console.log(isAllowed);
     if (!isAllowed) {
       throw new Error("Update not allowed");
     }
@@ -45,10 +45,12 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     const loggedInUser = req.user;
 
     //Upadate in db
-    await Object.keys(req.body).every(
+    const isEditAllowed = Object.keys(req.body).every(
       (key) => (loggedInUser[key] = req.body[key])
     );
-
+    if (!isEditAllowed) {
+      return res.status(400).send("Invalid Edit Request");
+    }
     await loggedInUser.save();
     res.send("Update succssfully");
   } catch (err) {
