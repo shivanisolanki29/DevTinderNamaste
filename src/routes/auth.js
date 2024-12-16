@@ -24,8 +24,17 @@ authRouter.post("/signup", async (req, res) => {
       password: pwdHash,
     });
 
-    await user.save();
-    res.send(`${user.firstName} successfully added in DB`);
+    const savedUser = await user.save();
+
+    let token = await jwt.sign({ _id: savedUser._id }, "Dev@Tinder123", {
+      expiresIn: "7d",
+    });
+    res.cookie("token", token, { expires: new Date(Date.now() + 8 * 3600000) });
+
+    res.json({
+      message: `${savedUser.firstName} successfully added in DB`,
+      data: savedUser,
+    });
     // res.send(` successfully added in DB`);
   } catch (err) {
     res.status(400).send("Error saving the user: " + err.message);

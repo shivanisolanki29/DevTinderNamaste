@@ -1,6 +1,8 @@
 const { default: mongoose, model, Schema } = require("mongoose");
 const { default: isEmail } = require("validator/lib/isEmail");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new Schema(
   {
@@ -68,8 +70,30 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
+
+UserSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = await jwt.sign({ _id: user._id }, "Dev@Tinder123", {
+    expiresIn: "7d",
+  });
+  return token;
+};
+
+UserSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+
+  const passwordHash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash
+  );
+  return isPasswordValid;
+};
 //note change model name - collectionname in database from usermodels to users
 const Users = new model("User", UserSchema);
 //const users = mongoose.model(users,UserSchema)
+//module.exports = mongoose.model(users,UserSchema)
 
 module.exports = { Users };
